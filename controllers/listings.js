@@ -51,6 +51,7 @@ module.exports.createListing = async (req, res, next) => {
         const newlisting = new Listing(req.body.listing);
         newlisting.owner = req.user._id;
         newlisting.image = { url, filename };
+        newlisting.geometry = null; // Default to null
 
         // Try to geocode location if Mapbox token is available
         if (geocodingClient) {
@@ -62,31 +63,24 @@ module.exports.createListing = async (req, res, next) => {
                     .send();
 
                 // Validate geocoding response
-                if (!response.body.features || response.body.features.length === 0) {
-                    throw new ExpressError(400, "Location not found. Please enter a valid location.");
-                }
-
-                newlisting.geometry = response.body.features[0].geometry;
-            } catch (mapboxError) {
-                console.error("Mapbox API Error:", mapboxError.message);
-                
-                // Handle specific API errors
-                if (mapboxError.message.includes("Unauthorized") || mapboxError.message.includes("401")) {
-                    throw new ExpressError(500, "Mapbox API authentication failed. Invalid API token configured.");
-                } else if (mapboxError.message.includes("Not Found") || mapboxError.message.includes("404")) {
-                    throw new ExpressError(400, "Location not found. Please enter a valid location.");
-                } else if (mapboxError.message.includes("Invalid token")) {
-                    throw new ExpressError(500, "Mapbox API token is invalid. Please contact admin.");
-                } else if (mapboxError instanceof ExpressError) {
-                    throw mapboxError; // Re-throw ExpressError
+                if (response.body.features && response.body.features.length > 0) {
+                    newlisting.geometry = response.body.features[0].geometry;
+                    console.log("✓ Location geocoded successfully");
                 } else {
-                    throw new ExpressError(500, "Mapbox geocoding service is unavailable. Please try again later.");
+                    // Location not found, but still allow listing creation
+                    console.warn("⚠ Location not found in Mapbox, creating listing without coordinates");
+                    req.flash("warning", "Listing created, but location coordinates could not be found. Map will not be available.");
                 }
+            } catch (mapboxError) {
+                console.error("⚠ Mapbox API Error:", mapboxError.message);
+                
+                // Don't throw error - just warn the user and create listing without coordinates
+                req.flash("warning", "Listing created, but location map is temporarily unavailable. You can still view and edit this listing.");
+                console.warn("Creating listing without Mapbox geocoding");
             }
         } else {
             console.warn("Mapbox geocoding is disabled. Creating listing without coordinates.");
-            // Create a default/null geometry if no geocoding available
-            newlisting.geometry = null;
+            req.flash("info", "Listing created without location map (Mapbox not configured).");
         }
 
         let saveListing = await newlisting.save();
@@ -115,16 +109,45 @@ module.exports.updateListing = async (req, res) => {
         throw new ExpressError(400, "Send valid data for listing");
     }
     let { id } = req.params;
-    // Update the listing
-    let listing = await Listing.findByIdAndUpdate(id, req.body.listing);
-    if (typeof req.file!=="undefined") {
-        let url = req.file.path;
-        let filename = req.file.filename;
-        listing.image = { url, filename };
+    
+    try {
+        // Update the listing
+        let listing = await Listing.findByIdAndUpdate(id, req.body.listing);
+        
+        // Try to update geometry if location changed and Mapbox is available
+        if (geocodingClient && req.body.listing.location) {
+            try {
+                let response = await geocodingClient.forwardGeocode({
+                    query: req.body.listing.location,
+                    limit: 1
+                })
+                    .send();
+
+                if (response.body.features && response.body.features.length > 0) {
+                    listing.geometry = response.body.features[0].geometry;
+                    console.log("✓ Location updated with coordinates");
+                }
+            } catch (mapboxError) {
+                console.warn("⚠ Mapbox error during update:", mapboxError.message);
+                // Don't throw error - let the update continue without coordinates
+                req.flash("warning", "Listing updated, but location map could not be updated.");
+            }
+        }
+        
+        // Update image if provided
+        if (typeof req.file !== "undefined") {
+            let url = req.file.path;
+            let filename = req.file.filename;
+            listing.image = { url, filename };
+        }
+        
         await listing.save();
+        req.flash("success", "Listing Updated!");
+        res.redirect(`/listings/${id}`);
+    } catch (error) {
+        // If something goes wrong, pass to error handler
+        throw new ExpressError(500, "Error updating listing. Please try again.");
     }
-    req.flash("success", "Listing Updated!");
-    res.redirect(`/listings/${id}`);
 };
 
 module.exports.destroyListing = async (req, res) => {

@@ -34,7 +34,20 @@ if (!dbUrl) {
 main().then(() => {
     console.log("connected to db");
 }).catch((err) => {
-    console.log(err);
+    console.error("❌ MongoDB Connection Error");
+    console.error("----------------------------------------------");
+    console.error("Could not connect to MongoDB Atlas");
+    console.error("");
+    console.error("SOLUTION: Whitelist your IP address");
+    console.error("1. Go to: https://cloud.mongodb.com/");
+    console.error("2. Navigate to: Network Access > IP Whitelist");
+    console.error("3. Click 'Add IP Address'");
+    console.error("4. Select 'Allow Access from Anywhere' OR add your specific IP");
+    console.error("5. Restart the application");
+    console.error("");
+    console.error("Error details:", err.message);
+    console.error("----------------------------------------------");
+    process.exit(1);
 });
 
 async function main() {
@@ -89,10 +102,16 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req, res, next) => {
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
-    res.locals.currUser = req.user;
+    res.locals.warning = req.flash("warning");
+    res.locals.info = req.flash("info");
+    res.locals.currUser = req.user || null;
     next();
 });
 
+// Landing / Home page
+app.get('/', (req, res) => {
+    res.render('home');
+});
 // app.get("/demouser", async (req, res) => {
 //     let fakeUser = new User({
 //         email: "student@gmail.com",
@@ -131,6 +150,7 @@ app.use((err, req, res, next) => {
     // res.status(statusCode).send(message);
 });
 
-app.listen(8080, () => {
-    console.log("server is listening at 8080 port");
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+    console.log(`server is listening at ${PORT} port`);
 });

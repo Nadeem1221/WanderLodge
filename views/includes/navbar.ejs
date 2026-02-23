@@ -17,14 +17,31 @@
     border-radius: 25px;
     padding: 0.5rem 3rem 0.5rem 3rem;
     font-size: 1rem;
+
   }
+  .logo {
+    width: 200px;              /* increase size */
+    height: auto;              /* keep aspect ratio */
+    padding-bottom: 1rem;
+}
+.logo-container {
+    display: flex;
+    justify-content: center;   /* center horizontally */
+    align-items: center;       /* center vertically (if height given) */
+    height: 40vh;             /* full screen height */
+}
+
 </style>
 
 <nav class="navbar navbar-expand-md bg-body-light border bottom sticky-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/listings"
-      ><i class="fa-regular fa-compass"></i
-    ></a>
+    <a class="navbar-brand" href="/"
+      >
+       <div class="logo-container">
+        <img src="/images/wanderlustlogo.png" alt="wanderLodge" class="logo">
+      </div>
+      
+   </a>
     <button
       class="navbar-toggler"
       type="button"
@@ -35,6 +52,7 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
+        <a class="nav-link" href="/">Home</a>
         <a class="nav-link" href="/listings">Explore</a>
       </div>
       <div class="navbar-nav ms-auto">
