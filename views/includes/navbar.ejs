@@ -15,25 +15,36 @@
   }
   .search-inp {
     border-radius: 25px;
-    padding: 0.5rem 3rem 0.5rem 3rem;
+    padding: 0.35rem 1rem 0.35rem 1rem;
     font-size: 1rem;
-
   }
+  .search-form { max-width: 520px; width: 100%; }
   .logo {
-    width: 200px;              /* increase size */
-    height: auto;              /* keep aspect ratio */
-    padding-bottom: 1rem;
-}
-.logo-container {
+    max-height: 48px;
+    width: auto;
+    padding-bottom: 0.25rem;
+  }
+  .logo-container {
     display: flex;
-    justify-content: center;   /* center horizontally */
-    align-items: center;       /* center vertically (if height given) */
-    height: 40vh;             /* full screen height */
-}
+    justify-content: center;
+    align-items: center;
+    height: auto;
+  }
+
+  /* Responsive tweaks for small screens */
+  @media (max-width: 767.98px) {
+    .logo { max-height: 40px; padding-bottom: 0.5rem; }
+    .search-inp { border-radius: 20px; padding: 0.5rem 1rem;  }
+    .search-btn { border-radius: 20px; width: 100%; margin-top: 0.5rem; }
+    .navbar .navbar-nav { width: 100%; }
+    .navbar .navbar-nav .nav-link { padding-left: 0; }
+    .d-flex[role="search"] { width: 100%; }
+    .d-flex[role="search"] { flex-direction: column; align-items: stretch; }
+  }
 
 </style>
 
-<nav class="navbar navbar-expand-md bg-body-light border bottom sticky-top">
+<nav class="navbar navbar-expand-md navbar-dark  main-navbar">
   <div class="container-fluid">
     <a class="navbar-brand" href="/"
       >
@@ -47,33 +58,36 @@
       type="button"
       data-bs-toggle="collapse"
       data-bs-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
     >
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="collapse navbar-collapse justify-content-between" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-link" href="/">Home</a>
         <a class="nav-link" href="/listings">Explore</a>
       </div>
-      <div class="navbar-nav ms-auto">
-        <form class="d-flex" role="search">
+      <div class="navbar-nav w-100 my-2">
+        <form class="d-flex w-100 flex-column flex-md-row align-items-stretch search-form search-center" role="search">
           <input
-            class="form-control me-2 search-inp"
+            class="form-control me-2 search-inp flex-grow-1"
             type="search"
             placeholder="Search Destination"
           />
-          <button class="btn search-btn" type="submit">
+          <button class="btn search-btn mt-2 mt-md-0 ms-md-2" type="submit">
             <i class="fa-solid fa-magnifying-glass"></i>Search
           </button>
         </form>
       </div>
-      <div class="navbar-nav ms-auto">
-        <a class="nav-link" href="/listings/new">Airbnb your home</a>
+      <div class="navbar-nav ms-md-auto nav-right">
+        <a class="nav-link host-link" href="/listings/new">Airbnb your home</a>
         <% if(!currUser){ %>
-        <a class="nav-link" aria-current="page" href="/signup"
+        <a class="nav-link auth-link" aria-current="page" href="/signup"
           ><b>Sign up</b></a
         >
-        <a class="nav-link" href="/login"><b>Log in</b></a>
+        <a class="nav-link auth-link" href="/login"><b>Log in</b></a>
         <% } %> <% if(currUser) { %>
         <a class="nav-link" href="/logout">Log out</a>
         <% } %>

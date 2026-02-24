@@ -105,12 +105,13 @@ app.use((req, res, next) => {
     res.locals.warning = req.flash("warning");
     res.locals.info = req.flash("info");
     res.locals.currUser = req.user || null;
+    res.locals.isHomePage = false;
     next();
 });
 
 // Landing / Home page
 app.get('/', (req, res) => {
-    res.render('home');
+    res.render('home', { isHomePage: true });
 });
 // app.get("/demouser", async (req, res) => {
 //     let fakeUser = new User({

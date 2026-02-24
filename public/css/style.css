@@ -10,8 +10,35 @@ body{
 }
 
 .navbar{
-    height: 5rem;
-    background-color: white;
+    padding: 0.45rem 1rem;
+    align-items: center;
+    display: flex;
+}
+
+.main-navbar {
+    background-color: rgba(255, 255, 255, 0.22) !important;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    border-radius: 18px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+    width: calc(100% - 1.5rem);
+    max-width: 1320px;
+    margin: 0.75rem auto;
+}
+
+
+/* Home page: place navbar over the hero so hero image continues behind it */
+.home-page .main-navbar {
+    position: absolute !important;
+    top: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+
+.home-page .hero {
+    padding-top: 5.5rem;
 }
 
 .fa-compass{
@@ -122,3 +149,370 @@ body{
     height: 400px;
     width: 96vh;
 }
+
+/* Mobile-specific overrides (iPhone 14 Pro / similar widths) */
+@media (max-width: 420px) {
+    .navbar {
+        height: auto;
+        padding-top: 0.4rem;
+        padding-bottom: 0.4rem;
+    }
+    .navbar-brand { padding: 0.25rem 0; }
+    .logo { max-height: 40px; }
+    .navbar .navbar-collapse { padding-top: 0.5rem; }
+    .navbar .navbar-nav { width: 100%; }
+    .navbar .navbar-nav .nav-link { padding: 0.35rem 0; }
+    .search-inp { width: 100% !important; box-sizing: border-box; }
+    .search-btn { width: 100% !important; }
+    .d-flex[role="search"] { flex-direction: column; gap: 0.4rem; }
+    /* Limit search form width on larger viewports so it doesn't push other items */
+    .search-form { max-width: 520px; width: 100%; }
+    /* make map responsive on small screens */
+    #map { width: 100vw; height: 300px; }
+}
+
+/* Smaller padding for search input globally so it fits in nav */
+.search-inp { padding: 0.35rem 1rem !important; }
+
+/* Center search form on larger viewports and adjust right-side links */
+@media (min-width: 768px) {
+    /* place the search form in the center of the navbar */
+    .search-form.search-center {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 420px;
+        max-width: 40%;
+    }
+
+    /* logo size on desktop (reverted) */
+    .logo { max-height: 48px; }
+
+    /* make the right-side links a bit larger and spaced */
+    .nav-right { display: flex; align-items: center; gap: 0.6rem; white-space: nowrap; flex-wrap: nowrap; }
+    .nav-right .nav-link { padding: 0.35rem 0.5rem; font-size: 0.92rem; white-space: nowrap; }
+    .host-link { padding: 0.4rem 0.7rem; font-weight: 600; }
+    .auth-link { padding: 0.35rem 0.5rem; font-weight: 700; }
+
+    /* ensure left nav items stay visible */
+    .navbar .navbar-nav:first-of-type { display: flex; align-items: center; gap: 0.5rem; }
+}
+
+
+/* styling for our home page */
+.hero{
+    min-height: clamp(420px, 88vh, 900px);
+    height: calc(100vh - 76px);
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+    url("../images/home-hero.jpg");
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    text-align:center;
+    position:relative;
+}
+
+.full-bleed{
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
+}
+
+.hero h1{
+    font-size:55px;
+    margin-bottom:20px;
+}
+
+.hero p{
+    font-size:18px;
+    width:60%;
+    margin-bottom:25px;
+}
+
+.hero button{
+    padding:12px 25px;
+    border:none;
+    background:#ff4d6d;
+    color:white;
+    font-size:16px;
+    border-radius:5px;
+    cursor:pointer;
+}
+
+
+
+/* ===== BOOKING BAR ===== */
+.booking-bar{
+    width: min(1100px, 90vw);
+    background:white;
+    padding:18px 20px;
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap:12px;
+    align-items:end;
+    border-radius:10px;
+    box-shadow:0 5px 20px rgba(0,0,0,0.15);
+    position:absolute;
+    bottom:-40px;
+}
+
+.booking-bar .field{
+    display:flex;
+    flex-direction:column;
+    font-size:14px;
+    gap:6px;
+}
+
+.booking-bar label{
+    font-weight:600;
+    color:#222;
+}
+
+.booking-bar input{
+    padding:10px 12px;
+    border:1px solid #e0e0e0;
+    border-radius:6px;
+    font-size:15px;
+}
+
+.booking-bar input:focus{
+    outline:2px solid #ffb3c2;
+    border-color:#ff4d6d;
+}
+
+.booking-bar button{
+    padding:12px 20px;
+    background:#ff4d6d;
+    border:none;
+    color:white;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:700;
+    letter-spacing:0.2px;
+    transition:transform 120ms ease, box-shadow 120ms ease;
+}
+
+.booking-bar button:hover{
+    transform:translateY(-1px);
+    box-shadow:0 10px 24px rgba(0,0,0,0.12);
+}
+
+/* ===== BOOKING TIP ===== */
+.booking-tip{
+    margin-top:12px;
+    font-size:13.5px;
+    color:#f1f1f1;
+    text-shadow:0 1px 8px rgba(0,0,0,0.45);
+}
+
+@media (max-width: 768px) {
+    .booking-bar {
+        position: static;
+        width: 100%;
+        margin-top: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+    }
+
+    .booking-bar button {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+
+    .booking-tip { text-align:left; }
+}
+
+
+/* ===== RECOMMENDED section ===== */
+.section.recommended{
+    padding:90px 8% 110px;
+    text-align:center;
+    color:#222;
+}
+
+.section.recommended .sub{
+    margin-top:10px;
+    color:#777;
+    font-size:15px;
+}
+
+.rec-grid{
+    margin-top:38px;
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap:18px;
+    justify-items:center;
+}
+
+.rec-card{
+    width:100%;
+    max-width:320px;
+    background:#fff;
+    border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    overflow:hidden;
+    position:relative;
+    transition:transform 140ms ease, box-shadow 140ms ease;
+}
+
+.rec-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 16px 40px rgba(0,0,0,0.12);
+}
+
+.rec-img{
+    height:180px;
+    background-size:cover;
+    background-position:center;
+}
+
+.rec-body{
+    padding:14px 16px 16px;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.rec-body h3{
+    margin:0;
+    font-size:17px;
+}
+
+.rec-body .location{
+    margin:6px 0 0;
+    color:#888;
+    font-size:13px;
+}
+
+.price{
+    font-weight:700;
+    color:#ff4d6d;
+    font-size:15px;
+    text-align:right;
+}
+.price span{
+    display:block;
+    color:#aaa;
+    font-weight:500;
+    font-size:12px;
+}
+
+.wish{
+    position:absolute;
+    top:12px;
+    right:12px;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    border:none;
+    background:#fff;
+    box-shadow:0 6px 16px rgba(0,0,0,0.12);
+    cursor:pointer;
+    font-size:16px;
+    color:#ff4d6d;
+    transition:transform 120ms ease;
+}
+.wish:hover{ transform:scale(1.05); }
+
+.see-all{
+    display:inline-block;
+    margin-top:26px;
+    padding:12px 28px;
+    background:#ff4d6d;
+    color:#fff;
+    border-radius:8px;
+    font-weight:700;
+    text-decoration:none;
+    box-shadow:0 10px 24px rgba(0,0,0,0.12);
+}
+
+@media (max-width: 768px) {
+    .section.recommended { padding:70px 1.5rem 90px; }
+    .rec-img { height:160px; }
+}
+
+
+/* ===== HOME FOOTER ===== */
+.footer-section{
+    background:#f7f7f7;
+    padding:70px 10% 80px;
+    border-top:1px solid #ededed;
+    color:#111;
+}
+
+.footer-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap:32px 48px;
+    align-items:flex-start;
+    margin-left: 5rem;
+}
+
+.footer-col h4{
+    margin:0 0 14px;
+    font-size:17px;
+    font-weight:700;
+}
+
+.footer-col ul{
+    list-style:none;
+    padding:0;
+    margin:0;
+}
+
+.footer-col li a{
+    display:block;
+    padding:6px 0;
+    color:#111;
+    text-decoration:none;
+    font-size:14px;
+}
+
+.footer-col li a:hover{
+    text-decoration:underline;
+}
+
+.footer-col.social .social-icons{
+    display:flex;
+    gap:12px;
+    margin-top:6px;
+}
+
+.footer-col.social .social-icons a{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    background:#fff;
+    display:grid;
+    place-items:center;
+    color:#111;
+    box-shadow:0 6px 18px rgba(0,0,0,0.08);
+    text-decoration:none;
+    transition:transform 120ms ease;
+}
+
+.footer-col.social .social-icons a:hover{
+    transform:translateY(-2px);
+}
+
+.footer-section{
+    background:#f7f7f7;
+    padding:70px 3vw 80px;      /* tighter side padding */
+    width:100vw;                /* full bleed */
+    margin-left:calc(50% - 50vw);
+    margin-right:calc(50% - 50vw);
+    border-top:1px solid #ededed;
+    color:#111;
+}
+
+
+
+
+

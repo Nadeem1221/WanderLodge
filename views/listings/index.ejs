@@ -97,6 +97,7 @@
   <% for(let listing of allListings){ %>
   <a href="/listings/<%= listing._id %>" class="listing-link">
     <div class="card col listing-card">
+
       <img
         src="<%= listing.image.url %>"
         class="card-img-top"
@@ -117,6 +118,7 @@
   <% } %>
 </div>
 <script>
+
   let taxSwitch = document.getElementById("flexSwitchCheckDefault");
   taxSwitch.addEventListener("click", () => {
     let taxInfo = document.getElementsByClassName("tax-info");
