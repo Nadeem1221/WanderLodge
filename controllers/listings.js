@@ -1,18 +1,33 @@
 const { response } = require("express");
 const Listing = require("../models/listing.js");
-const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const ExpressError = require("../utils/ExpressError.js");
-const { validateMapboxToken } = require("../utils/mapboxConfig.js");
+const { validateGeoapifyKey } = require("../utils/geoapifyConfig.js");
 
-const mapToken = process.env.MAP_TOKEN;
-let geocodingClient = null;
+const geoapifyKey = process.env.GEOAPIFY_API_KEY;
+const geoapifyEnabled = validateGeoapifyKey(geoapifyKey);
+const GEOAPIFY_ENDPOINT = "https://api.geoapify.com/v1/geocode/search";
 
-// Initialize geocoding client only if token is valid
-if (validateMapboxToken(mapToken)) {
-    geocodingClient = mbxGeocoding({ accessToken: mapToken });
-    console.log("Mapbox API configured successfully.");
+const geocodeWithGeoapify = async (query) => {
+    if (!geoapifyEnabled) return null;
+
+    const url = `${GEOAPIFY_ENDPOINT}?text=${encodeURIComponent(query)}&limit=1&apiKey=${geoapifyKey}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+        throw new Error(`Geoapify responded with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.features && data.features.length > 0) {
+        return data.features[0].geometry;
+    }
+    return null;
+};
+
+if (geoapifyEnabled) {
+    console.log("Geoapify geocoding configured successfully.");
 } else {
-    console.warn("WARNING: Mapbox API token not configured. Geocoding features will be disabled. Listings can still be created without location maps.");
+    console.warn("WARNING: Geoapify API key not configured. Geocoding features will be disabled. Listings can still be created without location maps.");
 }
 
 module.exports.index = async (req, res) => {
@@ -53,34 +68,29 @@ module.exports.createListing = async (req, res, next) => {
         newlisting.image = { url, filename };
         newlisting.geometry = null; // Default to null
 
-        // Try to geocode location if Mapbox token is available
-        if (geocodingClient) {
+        // Try to geocode location if Geoapify is available
+        if (geoapifyEnabled) {
             try {
-                let response = await geocodingClient.forwardGeocode({
-                    query: req.body.listing.location,
-                    limit: 1
-                })
-                    .send();
+                const geometry = await geocodeWithGeoapify(req.body.listing.location);
 
-                // Validate geocoding response
-                if (response.body.features && response.body.features.length > 0) {
-                    newlisting.geometry = response.body.features[0].geometry;
-                    console.log("✓ Location geocoded successfully");
+                if (geometry) {
+                    newlisting.geometry = geometry;
+                    console.log("✓ Location geocoded successfully via Geoapify");
                 } else {
                     // Location not found, but still allow listing creation
-                    console.warn("⚠ Location not found in Mapbox, creating listing without coordinates");
+                    console.warn("⚠ Location not found in Geoapify, creating listing without coordinates");
                     req.flash("warning", "Listing created, but location coordinates could not be found. Map will not be available.");
                 }
-            } catch (mapboxError) {
-                console.error("⚠ Mapbox API Error:", mapboxError.message);
+            } catch (geoapifyError) {
+                console.error("⚠ Geoapify API Error:", geoapifyError.message);
                 
                 // Don't throw error - just warn the user and create listing without coordinates
                 req.flash("warning", "Listing created, but location map is temporarily unavailable. You can still view and edit this listing.");
-                console.warn("Creating listing without Mapbox geocoding");
+                console.warn("Creating listing without Geoapify geocoding");
             }
         } else {
-            console.warn("Mapbox geocoding is disabled. Creating listing without coordinates.");
-            req.flash("info", "Listing created without location map (Mapbox not configured).");
+            console.warn("Geoapify geocoding is disabled. Creating listing without coordinates.");
+            req.flash("info", "Listing created without location map (Geoapify not configured).");
         }
 
         let saveListing = await newlisting.save();
@@ -114,21 +124,17 @@ module.exports.updateListing = async (req, res) => {
         // Update the listing
         let listing = await Listing.findByIdAndUpdate(id, req.body.listing);
         
-        // Try to update geometry if location changed and Mapbox is available
-        if (geocodingClient && req.body.listing.location) {
+        // Try to update geometry if location changed and Geoapify is available
+        if (geoapifyEnabled && req.body.listing.location) {
             try {
-                let response = await geocodingClient.forwardGeocode({
-                    query: req.body.listing.location,
-                    limit: 1
-                })
-                    .send();
+                const geometry = await geocodeWithGeoapify(req.body.listing.location);
 
-                if (response.body.features && response.body.features.length > 0) {
-                    listing.geometry = response.body.features[0].geometry;
+                if (geometry) {
+                    listing.geometry = geometry;
                     console.log("✓ Location updated with coordinates");
                 }
-            } catch (mapboxError) {
-                console.warn("⚠ Mapbox error during update:", mapboxError.message);
+            } catch (geoapifyError) {
+                console.warn("⚠ Geoapify error during update:", geoapifyError.message);
                 // Don't throw error - let the update continue without coordinates
                 req.flash("warning", "Listing updated, but location map could not be updated.");
             }

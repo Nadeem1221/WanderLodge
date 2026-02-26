@@ -79,8 +79,129 @@ body{
     align-items: space-evenly;
 }
 
+
+/* Listing cards (grid) */
+.listing-card {
+    position: relative;
+    border: none !important;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 14px 36px rgba(0,0,0,0.12);
+    transition: transform 140ms ease, box-shadow 140ms ease;
+    padding: 0;
+    margin-bottom: 18px;
+}
+
+.listing-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 48px rgba(0,0,0,0.16);
+}
+
+.card-img-wrap {
+    height: 210px;
+    overflow: hidden;
+}
+
+.card-img-wrap .card-img-top {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0;
+}
+
+.listing-body {
+    padding: 14px 16px 16px;
+}
+
+.listing-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1c1c1c;
+    margin-bottom: 6px;
+}
+
+.listing-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #757575;
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.listing-emoji {
+    font-size: 15px;
+}
+
+.listing-price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+
+.listing-price {
+    color: #ff4d6d;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.per-night {
+    color: #b0b0b0;
+    font-size: 12px;
+}
+
+/* Remove underline from listing links */
+.listing-link {
+    text-decoration: none !important;
+    color: inherit;
+    display: block;
+}
+
+.listing-link:hover,
+.listing-link:focus,
+.listing-link:active {
+    text-decoration: none !important;
+    color: inherit;
+}
+
+
+/* Heart (save) button */
+.wish-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.96);
+    box-shadow: 0 10px 26px rgba(0,0,0,0.15);
+    color: #ff4d6d;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+    z-index: 2;
+}
+
+.wish-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 32px rgba(0,0,0,0.18);
+}
+
+.wish-btn.active {
+    background: #ff4d6d;
+    color: #fff;
+}
+
+.wish-btn.active i::before {
+    font-weight: 900; /* makes the heart appear solid */
+}
+
+
 /* cards */
-.listing-card{
+/* .listing-card{
     border: none !important;
     margin-bottom: 2rem;
 }
@@ -104,13 +225,13 @@ body{
 }
 
 /* card effect */
-.card-img-overlay{
+/*.card-img-overlay{
     opacity: 0;
 }
 .card-img-overlay:hover{
     opacity: 0.2;
     background-color: white;
-}
+} */
 
 /* new page */
 .add-btn{
@@ -510,7 +631,10 @@ body{
     margin-right:calc(50% - 50vw);
     border-top:1px solid #ededed;
     color:#111;
+    
 }
+
+
 
 
 
