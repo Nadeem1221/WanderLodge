@@ -21,6 +21,14 @@
       </p>
       <p class="card-body"><%=listing.location%></p>
       <p class="card-body"><%=listing.country%></p>
+      <button
+        type="button"
+        class="btn btn-primary w-100 mt-2"
+        data-bs-toggle="modal"
+        data-bs-target="#bookingModal"
+      >
+        Book for &#8377;<%= listing.price.toLocaleString("en-IN") %>
+      </button>
     </div>
   </div>
 </div>
@@ -126,6 +134,113 @@
   <% } %>
 </div>
 
+<!-- Booking Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="bookingModalLabel">Book <%= listing.title %></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-2"><strong>Price:</strong> &#8377;<%= listing.price.toLocaleString("en-IN") %> per stay</p>
+        <p>This is a placeholder booking action. To confirm, please contact the host or proceed once checkout is enabled.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Confirm (placeholder)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <% if(listing.geometry) { %>
 <script src="/js/map.js"></script>
 <% } %>
+
+ 
+
+<%
+  const reviewsCount = listing.reviews.length;
+  const avgRating = reviewsCount
+    ? (listing.reviews.reduce((sum, r) => sum + r.rating, 0) / reviewsCount).toFixed(1)
+    : "–";
+  const yearsHosting = listing.createdAt
+    ? Math.max(1, Math.round((Date.now() - new Date(listing.createdAt)) / (1000 * 60 * 60 * 24 * 365)))
+    : "–";
+%>
+
+<div class="container col-10 col-md-8 mb-5 host-section">
+  <hr class="mb-4" />
+  <h3 class="mb-4">Meet your host</h3>
+  <div class="row gy-4 align-items-center">
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm p-3">
+        <div class="d-flex align-items-center">
+          <img
+            src="<%= listing.owner.avatar || 'https://i.pravatar.cc/160' %>"
+            alt="<%= listing.owner.username %>"
+            class="rounded-circle"
+            style="width:76px; height:76px; object-fit:cover;"
+          />
+          <div class="ms-3">
+            <h4 class="mb-1"><%= listing.owner.username %></h4>
+            <div class="text-muted small">Host</div>
+          </div>
+        </div>
+        <div class="row text-center mt-3">
+          <div class="col">
+            <div class="fw-bold fs-5"><%= reviewsCount %></div>
+            <div class="text-muted small">Reviews</div>
+          </div>
+          <div class="col">
+            <div class="fw-bold fs-5"><%= avgRating %><%= avgRating !== "–" ? "★" : "" %></div>
+            <div class="text-muted small">Rating</div>
+          </div>
+          <div class="col">
+            <div class="fw-bold fs-5"><%= yearsHosting %></div>
+            <div class="text-muted small">Years hosting</div>
+          </div>
+        </div>
+      </div>
+      <ul class="list-unstyled mt-3 mb-0 text-muted small">
+        <li>Born in the 90s</li>
+        <li>Where I went to school: Army Public School, Jaipur</li>
+      </ul>
+    </div>
+
+    <div class="col-md-6">
+      <p class="fw-semibold mb-1"><%= listing.owner.username %> is a highly rated host</p>
+      <p class="text-muted">
+        Superhosts are experienced, highly rated hosts who are committed to providing great stays for guests.
+      </p>
+
+      <% if (listing.coHosts && listing.coHosts.length) { %>
+        <p class="fw-semibold mb-1">Co‑Hosts</p>
+        <div class="d-flex align-items-center gap-3 mb-3 flex-wrap">
+          <% listing.coHosts.forEach(function (co) { %>
+            <div class="d-flex align-items-center">
+              <img src="<%= co.avatar || 'https://i.pravatar.cc/80' %>" class="rounded-circle"
+                   style="width:48px; height:48px; object-fit:cover;" alt="<%= co.name %>" />
+              <span class="ms-2"><%= co.name %></span>
+            </div>
+          <% }); %>
+        </div>
+      <% } %>
+
+      <p class="fw-semibold mb-1">Host details</p>
+      <p class="text-muted mb-3">Response rate: 100%<br />Responds within an hour</p>
+      <% if (listing.owner.email) { %>
+        <a class="btn btn-outline-dark rounded-pill px-4"
+           href="mailto:<%= listing.owner.email %>">Message host</a>
+      <% } else { %>
+        <button class="btn btn-outline-dark rounded-pill px-4" type="button" disabled>
+          Email not provided
+        </button>
+      <% } %>
+    </div>
+  </div>
+  <hr class="mt-5" />
+</div>
+
+<!-- Booking Modal -->
