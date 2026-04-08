@@ -152,6 +152,9 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-    console.log(`server is listening at ${PORT} port`);
-});
+if (process.env.NODE_ENV !== "production") {
+    app.listen(PORT, () => {
+        console.log(`server is listening at ${PORT} port`);
+    });
+}
+module.exports = app;
